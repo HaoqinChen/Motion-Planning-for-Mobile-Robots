@@ -1,5 +1,5 @@
-function [Aeq, beq] = getAbeq(n_seg, n_order, ts, start_cond, end_cond)
-    n_all_poly = n_seg*(n_order+1);
+function [Aeq, beq] = getAbeq(n_seg, n_order, ts, start_cond, end_cond, waypoints)
+    n_all_poly = n_seg*(n_order+1); % 所有控制点多项式系数总和
     %#####################################################
     % STEP 2.1 p,v,a,j constraint in start 
     Aeq_start = zeros(4, n_all_poly); % Ascending order
@@ -23,12 +23,19 @@ function [Aeq, beq] = getAbeq(n_seg, n_order, ts, start_cond, end_cond)
     
     %#####################################################
     % STEP 2.3 position continuity constrain between 2 segments
-    Aeq_con_p = zeros(n_seg-1, n_all_poly);
+    Aeq_con_p = zeros(2*n_seg-2, n_all_poly);
     for k = 1:n_seg-1
-        Aeq_con_p(k,k*(n_order+1)) = 1 * ts(k)^(1);
-        Aeq_con_p(k,k*(n_order+1)+1) = -1 * ts(k+1)^(1);
+        Aeq_con_p(2*k-1,k*(n_order+1)) = 1 * ts(k)^(1);
+        Aeq_con_p(2*k,k*(n_order+1)+1) = 1 * ts(k+1)^(1);
+        %Aeq_con_p(k,k*(n_order+1)) = waypoint(k, axis);
     end
-    beq_con_p = zeros(n_seg-1,1);
+    beq_con_p = zeros(2*n_seg-2,1);
+    beq_con_p(1,1) = 80;
+    beq_con_p(2,1) = 80;
+    for k = 2:n_seg-1
+        beq_con_p(2*k-1,1) = waypoints(k);
+        beq_con_p(2*k,1) = waypoints(k);
+    end
 
     %#####################################################
     % STEP 2.4 velocity continuity constrain between 2 segments
