@@ -33,7 +33,7 @@ end 0
 %每一段轨迹的时间分配为1s
 ts = zeros(n_seg, 1);
 for i = 1:n_seg
-    ts(i,1) = 1;
+    ts(i,1) = 1;·
 end
 
 %对时间比例的调整
